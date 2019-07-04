@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
-interface FolderObj {
+export interface FolderObj {
   name: string;
   path: string;
   children: FolderObj[];
@@ -43,7 +43,7 @@ const getFolderTree = folderPath => {
 
   getFolders(folders);
 
-  return root;
+  return [root];
 };
 
 export default getFolderTree;

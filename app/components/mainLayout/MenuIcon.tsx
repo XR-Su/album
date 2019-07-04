@@ -13,6 +13,7 @@ const Wrapper = styled('div')`
   right: 6px;
   top: 4px;
   cursor: pointer;
+  z-index: 1;
 `;
 
 const Icon = styled('i')`

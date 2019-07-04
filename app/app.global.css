@@ -4,11 +4,17 @@
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 
+:root {
+  --gray-161: rgb(161, 161, 161);
+  --gray-224: rgb(224, 224, 224);
+  --gray-deep-36: rgb(36, 36, 36);
+}
+
 body {
   position: relative;
   color: white;
   height: 100vh;
-  background-color: rgb(36, 36, 36);
+  background-color: var(--gray-deep-36);
   font-family: Arial, Helvetica, Helvetica Neue, serif;
   overflow-y: hidden;
   margin: 0;

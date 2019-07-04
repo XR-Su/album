@@ -10,9 +10,9 @@ import SideBar from './SideBar';
 import MenuIcon from './MenuIcon';
 
 const Content = styled('div')<{ open: boolean }>`
-  padding: 10px;
   ${props => props.open && 'margin-left: 220px'}
   transition: margin-left 0.3s ease;
+  height: 100vh;
 `;
 
 const MainLayout = ({ children }) => {

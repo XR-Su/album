@@ -9,6 +9,7 @@ import styled from 'styled-components';
 
 interface MenuGroupProps {
   name: string;
+  children: any;
 }
 
 const Wrapper = styled('div')`
@@ -17,13 +18,15 @@ const Wrapper = styled('div')`
 
 const Label = styled('p')`
   font-size: 12px;
-  color: rgb(161, 161, 161);
+  color: var(--gray-161);
 `;
 
-const MenuGroup = ({ name }: MenuGroupProps) => (
+const MenuGroup = ({ name, children }: MenuGroupProps) => (
   <Wrapper>
     <Label>{name}</Label>
+    {children}
   </Wrapper>
 );
 
+// @ts-ignore
 export default MenuGroup;

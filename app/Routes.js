@@ -2,10 +2,8 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import App from './pages/App';
-import HomePage from './pages/HomePage';
-import CounterPage from './pages/CounterPage';
-import Test from './components/Test';
-import MainLayout from './components/MainLayout';
+import HomePage from './pages/homePage';
+import MainLayout from './components/mainLayout';
 
 export default () => (
   <App>
@@ -19,10 +17,6 @@ export default () => (
         )}
       />
     </MainLayout>
-    {/*<Switch>*/}
-    {/*  <Route path={routes.COUNTER} component={CounterPage} />*/}
-    {/*  <Route path={routes.TEST} component={MainLayout} />*/}
-    {/*  <Route path={routes.HOME} component={HomePage} />*/}
-    {/*</Switch>*/}
   </App>
 );
+

@@ -75,6 +75,23 @@ export default class MenuBuilder {
         }
       ]
     };
+    const subMenuFile = {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Open...',
+          click: () => {
+            this.mainWindow.webContents.send('action', 'open');
+          }
+        },
+        {
+          label: 'Add Marks',
+          click: () => {
+            this.mainWindow.webContents.send('action', 'addMarks');
+          }
+        }
+      ]
+    };
     const subMenuEdit = {
       label: 'Edit',
       submenu: [
@@ -177,7 +194,14 @@ export default class MenuBuilder {
     const subMenuView =
       process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      subMenuAbout,
+      subMenuFile,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp
+    ];
   }
 
   buildDefaultTemplate() {
