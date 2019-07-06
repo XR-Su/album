@@ -25,13 +25,14 @@ const Label = styled('p')`
   padding-left: 16px;
   color: var(--gray-224);
   height: 25px;
+  line-height: 25px;
   cursor: pointer;
 `;
 const Arrow = styled('i')`
   position: absolute;
   left: 0;
   top: 0;
-  font-size: 16px;
+  font-size: 10px;
   color: var(--gray-161);
   margin-right: 1px;
 `;
@@ -69,7 +70,7 @@ const Item = ({ item }: ItemProps) => {
       <Arrow
         onClick={handleExpand}
         className={`iconfont ${
-          expandedMap[item.path] ? 'iconicon_sanjiaoxing' : 'iconjiantou1'
+          expandedMap[item.path] ? 'iconjiantou_xia' : 'iconjiantou_you'
         }`}
       />
     );

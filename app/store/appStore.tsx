@@ -10,6 +10,8 @@ import { TreeNode } from '../components/tree';
 /** interface **/
 export interface AppState {
   selectedFolder: TreeNode;
+  selectedImage: string;
+  isDragging: boolean;
 }
 
 /** actions **/
@@ -18,18 +20,32 @@ export interface AppState {
  * @param dispatch
  * @param folder
  */
-export const setFolderAction = (dispatch, folder) =>
+export const setFolderAction = (dispatch, folder: TreeNode) =>
   dispatch({ type: 'SET_SELECTED_FOLDER', folder });
 
+export const setImageAction = (dispatch, image: string) => {
+  dispatch({ type: 'SET_SELECTED_IMAGE', image });
+};
+
+export const setDragAction = (dispatch, isDrag: boolean) => {
+  dispatch({ type: 'SET_DRAG_STATUS', isDrag });
+};
+
 /** store **/
-const initialState: AppState = {
-  selectedFolder: { name: '', path: '', children: [] }
+export const initialState: AppState = {
+  selectedFolder: { name: '', path: '', children: [] },
+  selectedImage: '',
+  isDragging: false
 };
 
 const reducer = (state: AppState, action) => {
   switch (action.type) {
     case 'SET_SELECTED_FOLDER':
       return { ...state, selectedFolder: action.folder };
+    case 'SET_SELECTED_IMAGE':
+      return { ...state, selectedImage: action.image, isDragging: true };
+    case 'SET_DRAG_STATUS':
+      return { ...state, isDragging: action.isDrag };
     default:
       return state;
   }

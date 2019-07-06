@@ -6,8 +6,8 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import SideBar from './SideBar';
-import MenuIcon from './MenuIcon';
+import SideBar from './sideBar';
+import MenuIcon from './menuIcon';
 
 const Content = styled('div')<{ open: boolean }>`
   ${props => props.open && 'margin-left: 220px'}

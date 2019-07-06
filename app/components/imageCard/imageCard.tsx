@@ -6,6 +6,10 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import Lazyload from 'react-lazyload';
+import { setDragAction, setImageAction } from '../../store/appStore';
+import { useAppContext } from '../../store/appContext';
+import { ipcRenderer } from 'electron';
 
 interface ImageCardProps {
   url: string;
@@ -14,6 +18,8 @@ interface ImageCardProps {
   setLayerOpen?: (val: boolean) => void;
   setSelectedImg?: (val: string) => void;
 }
+
+const Wrapper = styled('div')``;
 
 const Image = styled('img')<{ height: string }>`
   height: ${props => (props.height ? props.height : null)};
@@ -28,20 +34,29 @@ const ImageCard = ({
   setLayerOpen = () => {},
   setSelectedImg = () => {}
 }: ImageCardProps) => {
-  const handleClick = () => {
+  const { dispatch } = useAppContext();
+  const handleDBClick = () => {
     setSelectedImg(url);
     setLayerOpen(true);
   };
+  const handleDragStart = () => {
+    setImageAction(dispatch, url);
+    ipcRenderer.send('ondragstart', url);
+  };
+  const handleDragEnd = () => {
+    setDragAction(dispatch, false);
+  };
+
   return (
-    <div>
-      <Image
-        onClick={handleClick}
-        style={style}
-        height={height}
-        src={url}
-        alt=""
-      />
-    </div>
+    <Wrapper
+      onDoubleClick={handleDBClick}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <Lazyload height={300} offset={500} once>
+        <Image style={style} height={height} src={url} alt="" />
+      </Lazyload>
+    </Wrapper>
   );
 };
 

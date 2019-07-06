@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -99,4 +99,13 @@ app.on('ready', async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+});
+
+ipcMain.on('ondragstart', (event, filePath) => {
+  let image = nativeImage.createFromPath(filePath);
+  image = image.resize({ width: 100 });
+  event.sender.startDrag({
+    file: filePath,
+    icon: image
+  });
 });

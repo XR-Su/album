@@ -5,19 +5,20 @@
  * @date 2019-07-02
  */
 import React from 'react';
-import useAppStore, { AppState } from './appStore';
+import useAppStore, { AppState, initialState } from './appStore';
 
 interface AppContext {
-  state: object;
+  state: AppState;
   dispatch: (action: object) => void;
 }
 
 export const AppContext = React.createContext<AppContext>({
-  state: {},
+  state: initialState,
   dispatch: ({}) => {}
 });
 
-export const useAppContext = () => React.useContext(AppContext);
+export let useAppContext: () => AppContext;
+useAppContext = () => React.useContext(AppContext);
 
 const AppContextProvider = ({ children }) => {
   const { state, dispatch } = useAppStore();

@@ -8,3 +8,5 @@ export { default as getFolderTree } from './getFolderTree';
 export * from './getFolderTree';
 
 export { default as getFolderFiles } from './getFolderFiles';
+
+export { default as moveFile } from './moveFile';

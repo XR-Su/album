@@ -30,14 +30,12 @@ const ImagePreview = ({ url, setLayerOpen = () => {} }: ImagePreviewProps) => {
   React.useEffect(() => {
     const img = document.querySelector('#preview_image');
     const manager = new Hammer.Manager(img);
-    const Swipe = new Hammer.Swipe();
+    const Swipe = new Hammer.Swipe({});
     manager.add(Swipe);
     manager.on('swipe', e => {
       if (e.deltaY > 120) {
         setLayerOpen(false);
       }
-      console.log(e)
-      console.log('you are swipe me');
     });
   }, ['DidMount']);
   return (
