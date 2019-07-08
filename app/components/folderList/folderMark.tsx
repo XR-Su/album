@@ -85,7 +85,7 @@ const FolderMark = ({ folder }: FolderMarkProps) => {
         onDragOver={e => e.preventDefault()}
       >
         <Icon className="iconfont iconalbum" style={{ marginRight: '6px' }} />
-        <Label>{name}</Label>
+        <Label>{name && name.length > 12 ? name.slice(0, 12) : name}</Label>
       </MarkWrapper>
       <DeleteIcon>
         <Icon className="iconfont icondelete" />

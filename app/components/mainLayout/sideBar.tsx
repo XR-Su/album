@@ -74,7 +74,7 @@ const SideBar = ({ open }: SideBarProps) => {
   const { dispatch } = useAppContext();
 
   React.useEffect(() => {
-    // window.localStorage.clear()
+    window.localStorage.clear()
     initIpcRender(setFolders, setMarkFolders);
     const marks = window.localStorage.getItem('marks') || '';
     const folders = marks.split(',');
