@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import Hammer from 'hammerjs';
+import { useGesture } from 'react-use-gesture';
 
 interface ImagePreviewProps {
   url: string;
@@ -27,20 +27,21 @@ const Image = styled('img')`
 `;
 
 const ImagePreview = ({ url, setLayerOpen = () => {} }: ImagePreviewProps) => {
-  React.useEffect(() => {
-    const img = document.querySelector('#preview_image');
-    const manager = new Hammer.Manager(img);
-    const Swipe = new Hammer.Swipe({});
-    manager.add(Swipe);
-    manager.on('swipe', e => {
-      if (e.deltaY > 120) {
-        setLayerOpen(false);
+  const myRef = React.useRef(null);
+  const bind = useGesture(
+    {
+      onWheel: ({ delta }) => {
+        if (delta[1] < -120) {
+          setLayerOpen(false);
+        }
       }
-    });
-  }, ['DidMount']);
+    },
+    { domTarget: myRef }
+  );
+  React.useEffect(bind, [bind]);
   return (
     <Wrapper>
-      <Image src={url} id="preview_image" />
+      <Image ref={myRef} src={url} id="preview_image" />
     </Wrapper>
   );
 };

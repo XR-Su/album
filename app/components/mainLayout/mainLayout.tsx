@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import SideBar from './sideBar';
+import SideBar from '../sidebar/sideBar';
 import MenuIcon from './menuIcon';
 
 const Content = styled('div')<{ open: boolean }>`
@@ -16,7 +16,7 @@ const Content = styled('div')<{ open: boolean }>`
 `;
 
 const MainLayout = ({ children }) => {
-  const [sideBarOpen, setSideBarOpen] = React.useState(false);
+  const [sideBarOpen, setSideBarOpen] = React.useState(true);
   return (
     <div>
       <SideBar open={sideBarOpen} />

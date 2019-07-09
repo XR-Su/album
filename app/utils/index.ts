@@ -10,3 +10,5 @@ export * from './getFolderTree';
 export { default as getFolderFiles } from './getFolderFiles';
 
 export { default as moveFile } from './moveFile';
+
+export { default as localStore } from './localStore';

@@ -1,6 +1,8 @@
 const ls = window.localStorage;
-const str = (val: any) => JSON.stringify(val);
-const json = (val: any) => JSON.parse(val);
+const str = (val: any = '') => JSON.stringify(val);
+const json = (val: any) => {
+  return val ? JSON.parse(val) : undefined;
+};
 
 /**
  * set item
@@ -8,21 +10,26 @@ const json = (val: any) => JSON.parse(val);
  * @param val
  */
 export const setItem = (key: string, val: any) => {
-  ls.setItem(key, val);
+  ls.setItem(key, str(val));
 };
 
+export const clearItem = () => {};
+
+export const getItem = (key: string) => json(ls.getItem(key) || '');
+
+export const clearAll = () => ls.clear();
 /**
  * append value in an item
  * @param key
  * @param val
  */
 export const append = (key: string, val: any) => {
-  const store = json(ls.getItem(key) || '');
+  const store = getItem(key);
   if (store) {
-    if (val instanceof Object) {
-      setItem(key, str({ ...store, ...val }));
-    } else if (val instanceof Array) {
-      setItem(key, str([...store, ...val]));
+    if (val instanceof Array) {
+      setItem(key, [...store, ...val]);
+    } else if (val instanceof Object) {
+      setItem(key, { ...store, ...val });
     } else {
       setItem(key, val);
     }
@@ -37,15 +44,15 @@ export const append = (key: string, val: any) => {
  * @param val
  */
 export const remove = (key: string, item: any) => {
-  const store = json(ls.getItem(key) || '');
+  const store = getItem(key);
   if (store) {
-    if (store instanceof Object) {
-      delete store[item];
-      setItem(key, str(store));
-    } else if (store instanceof Array) {
+    if (store instanceof Array) {
       const index = store.indexOf(item);
       store.splice(index, 1);
-      setItem(key, str(store));
+      setItem(key, store);
+    } else if (store instanceof Object) {
+      delete store[item];
+      setItem(key, store);
     } else {
       setItem(key, '');
     }
@@ -54,4 +61,11 @@ export const remove = (key: string, item: any) => {
   }
 };
 
-export const clearItem = () => {};
+export default {
+  setItem,
+  clearItem,
+  getItem,
+  clearAll,
+  append,
+  remove
+};

@@ -6,12 +6,15 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import Hammer from 'hammerjs';
-import { useAppContext } from '../../store/appContext';
-import { moveFile } from '../../utils';
+import { useGesture } from 'react-use-gesture';
+import _ from 'lodash';
+import { useSpring, animated, interpolate } from 'react-spring';
+import { useAppContext } from '../../../store/appContext';
+import { moveFile, localStore } from '../../../utils';
 
 interface FolderMarkProps {
   folder: string;
+  setMarkFolders: (val: string[]) => void;
 }
 
 const Wrapper = styled.div`
@@ -22,7 +25,7 @@ const Wrapper = styled.div`
   border-bottom: 1px solid var(--gray-161);
 `;
 
-const MarkWrapper = styled('div')`
+const MarkWrapper = styled(animated.div)`
   position: absolute;
   line-height: 50px;
   left: 0;
@@ -52,12 +55,28 @@ const Label = styled('span')`
   vertical-align: middle;
 `;
 
-const FolderMark = ({ folder }: FolderMarkProps) => {
+const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   const { state: app } = useAppContext();
+  const [transX, setTransX] = React.useState(0);
+  const [down, setDown] = React.useState(true);
   const name = folder.split('/').pop();
+  const bind = useGesture({
+    onDrag: ({ delta, down }) => {
+      setTransX(_.clamp(delta[0], -40, 0));
+      setDown(down);
+    }
+  });
+  const translate = () => {
+    if (down) {
+      return transX;
+    } else {
+      return transX < -20 ? -40 : 0;
+    }
+  };
+  const { x } = useSpring({
+    x: translate()
+  });
   const onDrop = () => {
-    console.log('mark', app.isDragging);
-    console.log('selectedImage', app.selectedImage);
     if (app.isDragging) {
       moveFile(
         app.selectedImage,
@@ -65,29 +84,25 @@ const FolderMark = ({ folder }: FolderMarkProps) => {
       );
     }
   };
-  const bindAnimation = el => {
-    if (el == null) return;
-    console.log(el);
-    const manager = new Hammer.Manager(el);
-    const Pan = new Hammer.Pan({ threshold: 1 });
-    manager.add(Pan);
-    manager.on('pan', e => {
-      console.log(el);
-      el.style.cssText += `;transform: translate(${e.deltaX}px,0);`;
-    });
+  const handleDelete = () => {
+    localStore.remove('marks', folder);
+    setMarkFolders(localStore.getItem('marks'));
   };
   return (
     <Wrapper>
       <MarkWrapper
-        ref={bindAnimation}
         className="folder-mark"
         onDrop={onDrop}
         onDragOver={e => e.preventDefault()}
+        {...bind()}
+        style={{
+          transform: interpolate([x], x => `translate3d(${x}px,0,0)`)
+        }}
       >
         <Icon className="iconfont iconalbum" style={{ marginRight: '6px' }} />
         <Label>{name && name.length > 12 ? name.slice(0, 12) : name}</Label>
       </MarkWrapper>
-      <DeleteIcon>
+      <DeleteIcon onClick={handleDelete}>
         <Icon className="iconfont icondelete" />
       </DeleteIcon>
     </Wrapper>

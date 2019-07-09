@@ -7,12 +7,12 @@
 import React from 'react';
 import { ipcRenderer, remote } from 'electron';
 import styled from 'styled-components';
-import MenuGroup from './menuGroup';
+import MenuGroup from './components/menuGroup';
 import Tree from '../tree';
-import List from '../folderList';
+import List from './components/folderList';
 import { useAppContext } from '../../store/appContext';
 import { setFolderAction } from '../../store/appStore';
-import { getFolderTree, FolderObj } from '../../utils';
+import { getFolderTree, FolderObj, localStore } from '../../utils';
 
 const Wrapper = styled.div<{ open: boolean }>`
   position: absolute;
@@ -37,30 +37,34 @@ const openFolderDialog = () => {
   );
 };
 
-const initFolders = (folders: string[]) => {
+const initFolders = (folders: string[] = []) => {
   let folderTrees: FolderObj[] = [];
-  folders &&
-    folders.forEach(folder => {
-      folderTrees.push(...getFolderTree(folder));
-    });
+  folders.forEach(folder => {
+    folderTrees.push(...getFolderTree(folder));
+  });
   return folderTrees;
 };
 
 const initIpcRender = (
   setFolders: (folders: FolderObj[]) => void,
-  setMarkFolders: (folders: string[]) => void
+  setMarkFolders: (folders: string[]) => void,
+  dispatch
 ) => {
   ipcRenderer.on('action', (event, arg) => {
     switch (arg) {
       case 'open':
-        setFolders(initFolders(openFolderDialog()));
+        // setFolders(initFolders(openFolderDialog()));
+        const of = openFolderDialog();
+        setFolderAction(dispatch, { name: '', path: of[0], children: [] });
+        setFolders(initFolders(of));
         break;
       case 'addMarks':
-        const marks = window.localStorage.getItem('marks') || '';
-        const folder = openFolderDialog();
-        const folders = marks == '' ? folder : [...marks.split(','), ...folder];
+        const folders = [
+          ...(localStore.getItem('marks') || []),
+          ...openFolderDialog()
+        ];
         setMarkFolders(folders);
-        window.localStorage.setItem('marks', folders.join(','));
+        localStore.setItem('marks', folders);
         break;
       default:
         console.log('no action');
@@ -74,11 +78,9 @@ const SideBar = ({ open }: SideBarProps) => {
   const { dispatch } = useAppContext();
 
   React.useEffect(() => {
-    window.localStorage.clear()
-    initIpcRender(setFolders, setMarkFolders);
-    const marks = window.localStorage.getItem('marks') || '';
-    const folders = marks.split(',');
-    marks.length && setMarkFolders(folders);
+    initIpcRender(setFolders, setMarkFolders, dispatch);
+    const marks = localStore.getItem('marks') || '';
+    marks && setMarkFolders(marks);
   }, ['DidMount']);
 
   const onChange = folder => {
@@ -90,7 +92,7 @@ const SideBar = ({ open }: SideBarProps) => {
         <Tree tree={folders} onChange={onChange} />
       </MenuGroup>
       <MenuGroup name="Marks">
-        <List list={markFolders} />
+        <List setMarkFolders={setMarkFolders} list={markFolders} />
       </MenuGroup>
     </Wrapper>
   );
