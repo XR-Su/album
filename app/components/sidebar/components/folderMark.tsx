@@ -4,7 +4,7 @@
  * @author RiSusss
  * @date 2019-07-02
  */
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
@@ -14,16 +14,11 @@ import { setSelectedImagesAction } from '../../../store/actions';
 import { moveFile, localStore, checkFileExist } from '../../../utils';
 import colors from '../../../constants/colors';
 
-import { AppContext } from '../../../store/appContext';
-
 interface FolderMarkProps {
   folder: string;
   setMarkFolders: (val: string[]) => void;
 }
 
-interface Dispatches {
-  setSelImgs: (images: string[]) => void;
-}
 // ${props =>
 //   props.isDragEnter
 //     ? 'box-shadow: 2px 10px 20px rgb(30,30,30);z-index: 1;'
@@ -206,67 +201,4 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   );
 };
 
-const initEvents = _this => {
-  _this.onDrop = () => {
-    const { state: app } = _this.context;
-    const { folder } = _this.props;
-    const { setSelImgs } = _this.dispatchs;
-    if (app.isDragging) {
-      if (app.selectedImages.length > 0) {
-        app.selectedImages.forEach(image => {
-          moveFile(image, folder + '/' + image.split('/').pop());
-        });
-        // reset selected images array
-        setSelImgs([]);
-      } else {
-        moveFile(
-          app.draggedImage,
-          folder + '/' + app.draggedImage.split('/').pop()
-        );
-      }
-    }
-  };
-  _this.onDragEnter = () => {
-    // setDragEnter(true);
-    _this.setState({ isDragEnter: true });
-  };
-  _this.onDragLeave = () => {
-    // setDragEnter(false);
-    _this.setState({ isDragEnter: true });
-  };
-  _this.handleDelete = () => {
-    const { folder, setMarkFolders } = _this.props;
-    localStore.remove('marks', folder);
-    _this.setState({});
-    setMarkFolders(localStore.getItem('marks'));
-  };
-};
-
-const initAttributes = _this => {
-
-}
-
-class FolderMarka extends Component<FolderMarkProps, {}> {
-  static contextType = AppContext;
-  dispatches: Dispatches;
-  isFolderExisted: boolean;
-  constructor(props) {
-    super(props);
-    const { folder } = props;
-    this.state = {
-      transX: 0,
-      isDragEnter: false
-    };
-    this.dispatches = { setSelImgs: images => {} };
-    this.isFolderExisted = checkFileExist(folder);
-  }
-  componentDidMount() {
-    this.dispatches = initDispatch(this.context.dispatch);
-    initEvents(this);
-  }
-  render() {
-    return <div />;
-  }
-}
-
-export default FolderMarka;
+export default FolderMark;
