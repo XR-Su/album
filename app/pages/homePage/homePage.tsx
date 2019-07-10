@@ -36,6 +36,12 @@ const ImageStance = styled('i')`
   width: 200px;
 `;
 
+const Title = styled('h2')`
+  padding-right: 30px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
+
 let selRange: string[] = [];
 
 const initDispatch = dispatch => ({
@@ -76,9 +82,11 @@ const HomePage = () => {
     if (isShiftDown) {
       if (selRange.length == 0) {
         selRange[0] = img;
-      } else if (selRange.indexOf(img) != -1) { // cancel the first selection.
+      } else if (selRange.indexOf(img) != -1) {
+        // cancel the first selection.
         selRange.splice(selRange.indexOf(img), 1);
-      } else { // calculate images in the range.
+      } else {
+        // calculate images in the range.
         selRange[1] = img;
         let li = images.indexOf(selRange[0]),
           ri = images.indexOf(selRange[1]);
@@ -94,7 +102,7 @@ const HomePage = () => {
   return (
     <Wrapper className="wrapper">
       <Gallery className="gallery">
-        <h2>{app.selectedFolder.name || 'welcome!'}</h2>
+        <Title>{app.selectedFolder.name || 'welcome!'}</Title>
         <ImagesContainer>
           {images.map(image => (
             <ImageCard

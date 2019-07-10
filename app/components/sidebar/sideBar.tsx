@@ -15,6 +15,8 @@ import { FolderObj, localStore } from '../../utils';
 import initIpcRender from './ipcRender';
 
 const Wrapper = styled.div<{ open: boolean }>`
+  display: flex;
+  flex-direction: column;
   position: absolute;
   width: 220px;
   height: 100vh;

@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron';
+import { uniq } from 'lodash';
 import { FolderObj, getFolderTree, localStore } from '../../../utils';
 
 const openFolderDialog = () => {
@@ -34,10 +35,10 @@ const initIpcRender = (
         setFileFolders(initFolders(of));
         break;
       case 'addMarks':
-        const folders = [
+        const folders = uniq([
           ...(localStore.getItem('marks') || []),
           ...openFolderDialog()
-        ];
+        ]);
         setMarkFolders(folders);
         localStore.setItem('marks', folders);
         break;

@@ -27,6 +27,8 @@ const Label = styled('p')`
   height: 25px;
   line-height: 25px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 const Arrow = styled('i')`
   position: absolute;
@@ -77,7 +79,7 @@ const Item = ({ item }: ItemProps) => {
   };
   return (
     <Wrapper>
-      <Label onClick={handleClick}>
+      <Label onClick={handleClick} title={item.name}>
         {item.children.length > 0 ? renderArrow() : null}
         <Icon className="iconfont iconios-albums" />
         {item.name}

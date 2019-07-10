@@ -34,7 +34,7 @@ const Image = styled('img')<{ height: string; isSelected: boolean }>`
   border: 2px solid;
   ${props =>
     props.isSelected
-      ? 'border-color: rgb(84, 138, 197)'
+      ? 'border-color: var(--blue)'
       : 'border-color: transparent'}
 `;
 

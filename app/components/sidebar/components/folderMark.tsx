@@ -4,7 +4,7 @@
  * @author RiSusss
  * @date 2019-07-02
  */
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { useGesture } from 'react-use-gesture';
 import { clamp } from 'lodash';
@@ -12,28 +12,36 @@ import { useSpring, animated, interpolate } from 'react-spring';
 import { useAppContext } from '../../../store/appContext';
 import { setSelectedImagesAction } from '../../../store/actions';
 import { moveFile, localStore, checkFileExist } from '../../../utils';
+import colors from '../../../constants/colors';
+
+import { AppContext } from '../../../store/appContext';
 
 interface FolderMarkProps {
   folder: string;
   setMarkFolders: (val: string[]) => void;
 }
-const Wrapper = styled.div<{ exist: boolean; isDragEnter: boolean }>`
+
+interface Dispatches {
+  setSelImgs: (images: string[]) => void;
+}
+// ${props =>
+//   props.isDragEnter
+//     ? 'box-shadow: 2px 10px 20px rgb(30,30,30);z-index: 1;'
+//     : ''}
+const Wrapper = styled(animated.div)`
   position: relative;
   height: 51px;
   text-align: right;
   padding-bottom: 5px;
-  border-bottom: 1px solid var(--gray-161);
-  border-radius: 4px;
-  ${props => (props.exist ? '' : 'color: rgb(204, 87, 87)')}
-  ${props =>
-    props.isDragEnter
-      ? 'box-shadow: 2px 10px 20px rgb(30,30,30);z-index: 1;'
-      : ''}
+  border-bottom: 1px solid;
+  border-color: var(--gray-161);
+  overflow: hidden;
 `;
 
 const MarkWrapper = styled(animated.div)`
   position: absolute;
-  line-height: 50px;
+  height: 50px;
+  padding-bottom: 10px;
   left: 0;
   right: 0;
   top: 0;
@@ -54,16 +62,21 @@ const DeleteIcon = styled.div`
   line-height: 50px;
   width: 40px;
   text-align: center;
-  background-color: red;
+  background-color: var(--red);
+  color: var(--font-color);
 `;
 
-const Label = styled('span')`
+const Label = styled('p')`
   font-size: 20px;
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  pointer-events: none;
 `;
 
 const initDispatch = dispatch => ({
-  setSelImgs: (images: string[]) => {
+  setSelImgs: images => {
     dispatch(setSelectedImagesAction(images));
   }
 });
@@ -71,20 +84,21 @@ const initDispatch = dispatch => ({
 const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   const { state: app, dispatch } = useAppContext();
   const [transX, setTransX] = React.useState(0);
-  const [down, setDown] = React.useState(true);
   const [isDragEnter, setDragEnter] = React.useState(false);
-  const name = folder.split('/').pop();
+
   const { setSelImgs } = initDispatch(dispatch);
   const isFolderExisted = checkFileExist(folder);
+  const name = folder.split('/').pop();
+
+  /** animations **/
   const bind = useGesture({
-    onDrag: ({ delta, down }) => {
-      setTransX(clamp(delta[0], -40, 0));
-      setDown(down);
+    onWheel: ({ delta }) => {
+      setTransX(clamp(-delta[0], -40, 0));
     }
   });
   const translate = () => {
-    if (down) {
-      return transX;
+    if (isDragEnter) {
+      return 24;
     } else {
       return transX < -20 ? -40 : 0;
     }
@@ -92,6 +106,8 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   const { x } = useSpring({
     x: translate()
   });
+
+  /** events **/
   const onDrop = () => {
     if (app.isDragging) {
       if (app.selectedImages.length > 0) {
@@ -119,6 +135,7 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
     setMarkFolders(localStore.getItem('marks'));
   };
 
+  /** attributes **/
   const drop = () => {
     return isFolderExisted
       ? {
@@ -129,18 +146,58 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
         }
       : {};
   };
+  const markStyle = () => {
+    const style = {
+      transform: interpolate([x], x => `translate3d(${x}px,0,0)`)
+    };
+    return isFolderExisted
+      ? {
+          style: {
+            ...style,
+            color: x.interpolate({
+              range: [0, 24],
+              output: [colors.FONT_COLOR, colors.POSITIVE_COLOR]
+            })
+          }
+        }
+      : {
+          style
+        };
+  };
+  const wrapperStyle = () => {
+    const style = {
+      color: colors.NEGATIVE_COLOR,
+      borderColor: colors.NEGATIVE_COLOR_SUB
+    };
+    return isFolderExisted
+      ? {
+          style: {
+            ...style,
+            borderColor: x.interpolate({
+              // @ts-ignore
+              range: [0, 24],
+              output: [colors.BORDER_COLOR, colors.POSITIVE_COLOR],
+              extrapolate: 'clamp'
+            })
+          }
+        }
+      : {
+          style
+        };
+  };
   return (
-    <Wrapper exist={isFolderExisted} isDragEnter={isDragEnter}>
+    <Wrapper {...wrapperStyle()}>
       <MarkWrapper
         className="folder-mark"
-        {...drop()}
         {...bind()}
-        style={{
-          transform: interpolate([x], x => `translate3d(${x}px,0,0)`)
-        }}
+        {...drop()}
+        {...markStyle()}
       >
-        <Icon className="iconfont iconalbum" style={{ marginRight: '6px' }} />
-        <Label>{name && name.length > 12 ? name.slice(0, 12) : name}</Label>
+        <Icon
+          className="iconfont iconalbum"
+          style={{ marginRight: '6px', pointerEvents: 'none' }}
+        />
+        <Label>{name}</Label>
       </MarkWrapper>
       <DeleteIcon onClick={handleDelete}>
         <Icon className="iconfont icondelete" />
@@ -149,4 +206,67 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   );
 };
 
-export default FolderMark;
+const initEvents = _this => {
+  _this.onDrop = () => {
+    const { state: app } = _this.context;
+    const { folder } = _this.props;
+    const { setSelImgs } = _this.dispatchs;
+    if (app.isDragging) {
+      if (app.selectedImages.length > 0) {
+        app.selectedImages.forEach(image => {
+          moveFile(image, folder + '/' + image.split('/').pop());
+        });
+        // reset selected images array
+        setSelImgs([]);
+      } else {
+        moveFile(
+          app.draggedImage,
+          folder + '/' + app.draggedImage.split('/').pop()
+        );
+      }
+    }
+  };
+  _this.onDragEnter = () => {
+    // setDragEnter(true);
+    _this.setState({ isDragEnter: true });
+  };
+  _this.onDragLeave = () => {
+    // setDragEnter(false);
+    _this.setState({ isDragEnter: true });
+  };
+  _this.handleDelete = () => {
+    const { folder, setMarkFolders } = _this.props;
+    localStore.remove('marks', folder);
+    _this.setState({});
+    setMarkFolders(localStore.getItem('marks'));
+  };
+};
+
+const initAttributes = _this => {
+
+}
+
+class FolderMarka extends Component<FolderMarkProps, {}> {
+  static contextType = AppContext;
+  dispatches: Dispatches;
+  isFolderExisted: boolean;
+  constructor(props) {
+    super(props);
+    const { folder } = props;
+    this.state = {
+      transX: 0,
+      isDragEnter: false
+    };
+    this.dispatches = { setSelImgs: images => {} };
+    this.isFolderExisted = checkFileExist(folder);
+  }
+  componentDidMount() {
+    this.dispatches = initDispatch(this.context.dispatch);
+    initEvents(this);
+  }
+  render() {
+    return <div />;
+  }
+}
+
+export default FolderMarka;

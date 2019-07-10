@@ -9,6 +9,9 @@
   --gray-224: rgb(224, 224, 224);
   --gray-deep-36: rgb(36, 36, 36);
   --gray-deep-50: rgb(50, 50, 50);
+  --red: rgb(204, 87, 87);
+  --blue: rgb(84, 138, 197);
+  --font-color: white;
 }
 
 body {
