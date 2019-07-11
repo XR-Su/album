@@ -19,6 +19,10 @@ interface FolderMarkProps {
   setMarkFolders: (val: string[]) => void;
 }
 
+interface Dispatches {
+  setSelImgs: (images: string[]) => void;
+}
+
 // ${props =>
 //   props.isDragEnter
 //     ? 'box-shadow: 2px 10px 20px rgb(30,30,30);z-index: 1;'
@@ -51,7 +55,7 @@ const Icon = styled('i')`
   font-size: 24px;
 `;
 
-const DeleteIcon = styled.div`
+const DeleteButton = styled.div`
   display: inline-block;
   height: 50px;
   line-height: 50px;
@@ -81,9 +85,15 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   const [transX, setTransX] = React.useState(0);
   const [isDragEnter, setDragEnter] = React.useState(false);
 
-  const { setSelImgs } = initDispatch(dispatch);
-  const isFolderExisted = checkFileExist(folder);
-  const name = folder.split('/').pop();
+  // let dispatches: Dispatches = initDispatch(dispatch);
+  let isFolderExisted = checkFileExist(folder);
+  let name = folder.split('/').pop();
+
+  // React.useEffect(() => {
+  //
+  // }, ['DidMount']);
+
+  const { setSelImgs } = initDispatch(dispatch);;
 
   /** animations **/
   const bind = useGesture({
@@ -98,8 +108,8 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
       return transX < -20 ? -40 : 0;
     }
   };
-  const { x } = useSpring({
-    x: translate()
+  const { markOffset } = useSpring({
+    markOffset: translate()
   });
 
   /** events **/
@@ -143,13 +153,13 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
   };
   const markStyle = () => {
     const style = {
-      transform: interpolate([x], x => `translate3d(${x}px,0,0)`)
+      transform: interpolate([markOffset], markOffset => `translate3d(${markOffset}px,0,0)`)
     };
     return isFolderExisted
       ? {
           style: {
             ...style,
-            color: x.interpolate({
+            color: markOffset.interpolate({
               range: [0, 24],
               output: [colors.FONT_COLOR, colors.POSITIVE_COLOR]
             })
@@ -168,7 +178,7 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
       ? {
           style: {
             ...style,
-            borderColor: x.interpolate({
+            borderColor: markOffset.interpolate({
               // @ts-ignore
               range: [0, 24],
               output: [colors.BORDER_COLOR, colors.POSITIVE_COLOR],
@@ -194,9 +204,9 @@ const FolderMark = ({ folder, setMarkFolders }: FolderMarkProps) => {
         />
         <Label>{name}</Label>
       </MarkWrapper>
-      <DeleteIcon onClick={handleDelete}>
+      <DeleteButton onClick={handleDelete}>
         <Icon className="iconfont icondelete" />
-      </DeleteIcon>
+      </DeleteButton>
     </Wrapper>
   );
 };
