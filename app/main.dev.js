@@ -15,6 +15,8 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 
+// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -91,6 +93,14 @@ app.on('ready', async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  mainWindow.on('scroll-touch-begin', () => {
+    mainWindow.webContents.send('action', 'scrollStart');
+  });
+
+  mainWindow.on('scroll-touch-end', () => {
+    mainWindow.webContents.send('action', 'scrollEnd');
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);

@@ -60,7 +60,6 @@ const initDispatch = dispatch => ({
 let innerWidth: number = 0;
 let curIndexG: number = 0;
 let isScroll: boolean = false;
-let gesDelta: [number, number] = [0, 0];
 let scrollDir: [number, number] = [0, 0];
 let throttle: boolean = true;
 
@@ -71,8 +70,8 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
   const { dispatch } = useAppContext();
   const { dispatchDrImg, dispatchDrStatus } = initDispatch(dispatch);
   //@ts-ignore
-  const [springs, set] = useSprings(preImages.length, i => ({
-    x: (i - curIndex) * 1000,
+  const [springs, set] = useSprings(preImages.length, i => ({ // 这里的参数是传入的，所以参数一旦改变，useSprings 内部肯定会刷新？如果内部用的 useState喃？
+    x: (i - curIndex) * 1800,
     display: 'flex'
   }));
 
@@ -90,7 +89,7 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
 
   const onScrollEnd = () => {
     throttle = false;
-    if (gesDelta[1] < -120 && scrollDir[1] == -1) {
+    if (scrollDir[1] == -1) {
       setLayerOpen(false);
     } else {
       // curIndex = clamp(curIndex + scrollDir[0], 0, preImages.length - 1);
@@ -148,8 +147,7 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
         isOffset = true;
       }
       if (isScroll && isOffset) {
-        gesDelta = delta;
-        const offsetX = clamp(gesDelta[0], -300, 300);
+        const offsetX = clamp(delta[0], -300, 300);
         setHorizScroll(offsetX);
       }
     }
