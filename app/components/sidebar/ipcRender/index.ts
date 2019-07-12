@@ -23,6 +23,7 @@ const initIpcRender = (
   setMarkFolders: (folders: string[]) => void,
   dispatchFolder: (folder: FolderObj) => void
 ) => {
+  ipcRenderer.removeAllListeners('action');
   ipcRenderer.on('action', (event, arg) => {
     switch (arg) {
       case 'open':

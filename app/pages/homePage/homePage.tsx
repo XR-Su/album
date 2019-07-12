@@ -120,7 +120,7 @@ const HomePage = () => {
         </ImagesContainer>
       </Gallery>
       <OverLayer isOpen={isLayerOpen}>
-        <ImagePreview url={selectedImg} {...{ setLayerOpen }} />
+        <ImagePreview url={selectedImg} {...{ setLayerOpen, images }} />
       </OverLayer>
     </Wrapper>
   );
