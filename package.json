@@ -79,6 +79,9 @@
         }
       ]
     },
+    "mac": {
+      "darkModeSupport": true
+    },
     "win": {
       "target": [
         "nsis",

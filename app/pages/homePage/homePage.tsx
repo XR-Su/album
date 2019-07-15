@@ -1,7 +1,4 @@
-// @flow
 import React from 'react';
-// import { Link } from 'react-router-dom';
-// import routes from '../constants/routes';
 import styled from 'styled-components';
 import { uniq } from 'lodash';
 import ImageCard from '../../components/imageCard';
@@ -69,13 +66,19 @@ const HomePage = () => {
           break;
       }
     };
-    document.addEventListener('keydown', e => {
+    const onKeyDown = e => {
       setKeyStatus(e.keyCode, true);
-    });
-    document.addEventListener('keyup', e => {
+    };
+    const onKeyUp = e => {
       setKeyStatus(e.keyCode, false);
-    });
-  }, ['DidMount']);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keyup', onKeyUp);
+    };
+  }, []);
 
   const onImgCardClick = (img: string) => {
     let selImgs = [img];

@@ -41,7 +41,7 @@ const SideBar = ({ open }: SideBarProps) => {
   const { dispatchFolder } = initDispatch(useAppContext().dispatch);
 
   React.useEffect(() => {
-    initIpcRender(setFileFolders, setMarkFolders, dispatchFolder);
+    initIpcRender({ setFileFolders, setMarkFolders, dispatchFolder });
     const marks = localStore.getItem('marks') || '';
     marks && setMarkFolders(marks);
   }, ['DidMount']);

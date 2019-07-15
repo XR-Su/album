@@ -11,11 +11,7 @@ import { useGesture } from 'react-use-gesture';
 import { useSprings, animated } from 'react-spring';
 import { clamp } from 'lodash';
 import initIpcRender from './ipcRender';
-import {
-  setDragImageAction,
-  setDragStatusAction,
-  setSelectedImagesAction
-} from '../../store/actions';
+import { setDragImageAction, setDragStatusAction } from '../../store/actions';
 import { useAppContext } from '../../store/appContext';
 
 interface ImagePreviewProps {
@@ -41,12 +37,6 @@ const ImageContainer = styled(animated.div)`
   width: 100%;
 `;
 
-// const Image = styled.div`
-//   height: 100%;
-//   background-size: contain;
-//   background-position: center center;
-//   background-repeat: no-repeat;
-// `;
 const Image = styled('img')`
   max-height: 100%;
   max-width: 100%;
@@ -58,7 +48,7 @@ const initDispatch = dispatch => ({
 });
 
 let innerWidth: number = 0;
-let curIndexG: number = 0;
+let curIndexTmp: number = 0;
 let isScroll: boolean = false;
 let scrollDir: [number, number] = [0, 0];
 let throttle: boolean = true;
@@ -70,18 +60,28 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
   const { dispatch } = useAppContext();
   const { dispatchDrImg, dispatchDrStatus } = initDispatch(dispatch);
   //@ts-ignore
-  const [springs, set] = useSprings(preImages.length, i => ({ // 这里的参数是传入的，所以参数一旦改变，useSprings 内部肯定会刷新？如果内部用的 useState喃？
+  const [springs, setSprings] = useSprings(preImages.length, i => ({
+    // 这里的参数是传入的，所以参数一旦改变，useSprings 内部肯定会刷新？如果内部用的 useState喃？
+    // 要看组件内部是否使用 useState 来存储变量
     x: (i - curIndex) * 1800,
     display: 'flex'
   }));
 
   React.useEffect(() => {
-    curIndexG = curIndex;
+    curIndexTmp = curIndex;
+    initIpcRender({ onScroll, onScrollEnd, onResize, onImagesOpen });
+  }, []);
+
+  React.useEffect(() => {
+    // recalculate the position of the images
     //@ts-ignore
     innerWidth = wrapper.current.clientWidth;
     setHorizScroll();
-    initIpcRender({ onScroll, onScrollEnd });
-  }, []);
+  });
+
+  const onImagesOpen = () => {
+    setLayerOpen(false);
+  };
 
   const onScroll = val => {
     isScroll = val;
@@ -92,31 +92,34 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
     if (scrollDir[1] == -1) {
       setLayerOpen(false);
     } else {
-      // curIndex = clamp(curIndex + scrollDir[0], 0, preImages.length - 1);
-      // setCurIndex(clamp(curIndex + scrollDir[0], 0, preImages.length - 1));
-      curIndexG = clamp(curIndexG + scrollDir[0], 0, preImages.length - 1);
+      curIndexTmp = clamp(curIndexTmp + scrollDir[0], 0, preImages.length - 1);
       setHorizScroll();
     }
   };
 
+  const onResize = () => {
+    setCurIndex(curIndexTmp);
+    setPreImages([...preImages]);
+  };
+
   const handleDragStart = () => {
     dispatchDrImg(url);
-    ipcRenderer.send('ondragstart', preImages[curIndexG]);
+    ipcRenderer.send('ondragstart', preImages[curIndexTmp]);
   };
   const handleDragEnd = () => {
     dispatchDrStatus(false);
     const tmp = [...preImages];
-    tmp.splice(curIndexG, 1);
-    setCurIndex(curIndexG);
+    tmp.splice(curIndexTmp, 1);
+    setCurIndex(curIndexTmp);
     setPreImages(tmp);
   };
   const setHorizScroll = (offset: number = 0) => {
     //@ts-ignore
-    set(i => {
-      if (i < curIndexG - 1 || i > curIndexG + 1) {
+    setSprings(i => {
+      if (i < curIndexTmp - 1 || i > curIndexTmp + 1) {
         return { display: 'none' };
       }
-      const x = (i - curIndexG) * innerWidth - offset;
+      const x = (i - curIndexTmp) * innerWidth - offset;
       return { x, display: 'flex' };
     });
   };
@@ -167,9 +170,6 @@ const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             src={preImages[i]}
-            // style={{
-            //   backgroundImage: `url('${images[i]}')`
-            // }}
           />
         </ImageContainer>
       ))}
