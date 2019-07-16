@@ -4,6 +4,7 @@
  * @author RiSusss
  * @date 2019-07-02
  */
+
 import React from 'react';
 import { ipcRenderer } from 'electron';
 import styled from 'styled-components';
@@ -53,6 +54,19 @@ let isScroll: boolean = false;
 let scrollDir: [number, number] = [0, 0];
 let throttle: boolean = true;
 
+
+/**
+ *  分层：
+ *  事件的监听
+ *  动画的设置
+ *  容器宽度的获取
+ *
+ *  最终依赖项：
+ *  springs
+ *  onDragStart
+ *  onDragEnd
+ *
+ */
 const ImagePreview = ({ url, setLayerOpen, images }: ImagePreviewProps) => {
   const wrapper = React.useRef(null);
   const [preImages, setPreImages] = React.useState(images);
