@@ -8,7 +8,7 @@ interface initIpcRenderProps {
   onImagesOpen?: () => void;
 }
 
-const initIpcRender = listener => {
+export const initIpcRender = listener => {
   return ({
     onScroll = () => {},
     onScrollStart = () => {},
@@ -40,7 +40,7 @@ const initIpcRender = listener => {
           onImagesOpen();
           break;
         default:
-          console.log('preview no action');
+        // console.log('preview no action');
       }
     };
     ipcRenderer.on('action', listener);
@@ -48,4 +48,11 @@ const initIpcRender = listener => {
   };
 };
 
-export default initIpcRender;
+export const cleanupIpcRender = listener => {
+  ipcRenderer.removeListener('action', listener);
+};
+
+export default {
+  initIpcRender,
+  cleanupIpcRender
+};

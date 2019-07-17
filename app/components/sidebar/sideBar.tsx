@@ -54,7 +54,7 @@ const SideBar = ({ open }: SideBarProps) => {
       <MenuGroup name="Folder">
         <Tree tree={fileFolders} onChange={onChange} />
       </MenuGroup>
-      <MenuGroup name="Marks">
+      <MenuGroup name="Classes">
         <List setMarkFolders={setMarkFolders} list={markFolders} />
       </MenuGroup>
     </Wrapper>

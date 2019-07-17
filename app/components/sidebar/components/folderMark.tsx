@@ -8,7 +8,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { animated } from 'react-spring';
 import { useAppContext } from '../../../store/appContext';
-import { setSelectedImagesAction } from '../../../store/actions';
+import {
+  setSelectedImagesAction,
+  setSelectedFolderAction
+} from '../../../store/actions';
 import { moveFile, localStore, checkFileExist } from '../../../utils';
 import { useMarkAnimation } from './animation';
 
@@ -21,10 +24,6 @@ interface Dispatches {
   setSelImgs: (images: string[]) => void;
 }
 
-// ${props =>
-//   props.isDragEnter
-//     ? 'box-shadow: 2px 10px 20px rgb(30,30,30);z-index: 1;'
-//     : ''}
 const Wrapper = styled(animated.div)`
   position: relative;
   height: 51px;
@@ -33,6 +32,7 @@ const Wrapper = styled(animated.div)`
   border-bottom: 1px solid;
   border-color: var(--gray-161);
   overflow: hidden;
+  cursor: pointer;
 `;
 
 const MarkWrapper = styled(animated.div)`
@@ -75,6 +75,15 @@ const Label = styled('p')`
 const initDispatch = dispatch => ({
   setSelImgs: images => {
     dispatch(setSelectedImagesAction(images));
+  },
+  setSelFolder: folder => {
+    dispatch(
+      setSelectedFolderAction({
+        name: folder.split('/').pop(),
+        path: folder,
+        children: []
+      })
+    );
   }
 });
 
@@ -82,7 +91,7 @@ const FolderMark = React.memo(({ folder, setMarkFolders }: FolderMarkProps) => {
   const { state: app, dispatch } = useAppContext();
   const [isImgEnter, setImgEnter] = React.useState(false);
 
-  const { setSelImgs } = initDispatch(dispatch);
+  const { setSelImgs, setSelFolder } = initDispatch(dispatch);
   const isFolderExisted: boolean = checkFileExist(folder);
   const name: string = folder.split('/').pop() || '';
 
@@ -120,7 +129,11 @@ const FolderMark = React.memo(({ folder, setMarkFolders }: FolderMarkProps) => {
     localStore.remove('marks', folder);
     setMarkFolders(localStore.getItem('marks'));
   };
-
+  const handleClick = () => {
+    if (isFolderExisted) {
+      setSelFolder(folder);
+    }
+  };
   /** attributes **/
   const drop = () => {
     return isFolderExisted
@@ -133,7 +146,7 @@ const FolderMark = React.memo(({ folder, setMarkFolders }: FolderMarkProps) => {
       : {};
   };
   return (
-    <Wrapper {...wrapperStyle()}>
+    <Wrapper {...wrapperStyle()} onClick={handleClick}>
       <MarkWrapper
         className="folder-mark"
         {...bind()}

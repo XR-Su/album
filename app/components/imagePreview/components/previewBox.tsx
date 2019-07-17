@@ -6,8 +6,14 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import initIpcRender from '../ipcRender';
-import PreviewEvent from './previewEvents';
+import { initIpcRender, cleanupIpcRender } from '../ipcRender';
+import PreviewList from './previewList';
+
+interface PreviewBoxProps {
+  setLayerOpen: (val: boolean) => void;
+  images: string[];
+  url: string;
+}
 
 const Wrapper = styled('div')`
   position: relative;
@@ -17,13 +23,13 @@ const Wrapper = styled('div')`
 
 let listener;
 
-const PreviewBox = ({ setLayerOpen, images, url }) => {
+const PreviewBox = ({ setLayerOpen, images, url }: PreviewBoxProps) => {
   const wrapper = React.useRef(null);
   const [boxWidth, setBoxWidth] = React.useState(1800);
-  const [update, forceUpdate] = React.useState(false);
+  const forceUpdate = React.useState([])[1];
   React.useEffect(() => {
-    // initIpcRender({ onResize, onImagesOpen });
     listener = initIpcRender(listener)({ onResize, onImagesOpen });
+    return () => cleanupIpcRender(listener);
   }, []);
   React.useEffect(() => {
     //@ts-ignore
@@ -32,16 +38,15 @@ const PreviewBox = ({ setLayerOpen, images, url }) => {
       setBoxWidth(innerWidth);
     }
   });
-
   const onResize = () => {
-    forceUpdate(!update);
+    forceUpdate([]);
   };
   const onImagesOpen = () => {
     setLayerOpen(false);
   };
   return (
     <Wrapper ref={wrapper}>
-      <PreviewEvent {...{ boxWidth, images, url, setLayerOpen }} />
+      <PreviewList {...{ boxWidth, images, url, setLayerOpen }} />
     </Wrapper>
   );
 };

@@ -58,7 +58,7 @@ const initIpcRender = () => {
           localStore.setItem('marks', folders);
           break;
         default:
-          console.log('sidebar no action');
+          // console.log('sidebar no action');
       }
     };
     ipcRenderer.on('action', listener);
