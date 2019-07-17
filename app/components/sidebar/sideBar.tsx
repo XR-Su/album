@@ -5,6 +5,7 @@
  * @date 2019-07-02
  */
 import React from 'react';
+import { remote } from 'electron';
 import styled from 'styled-components';
 import MenuGroup from './components/menuGroup';
 import Tree from '../tree';
@@ -49,12 +50,18 @@ const SideBar = ({ open }: SideBarProps) => {
   const onChange = folder => {
     dispatchFolder(folder);
   };
+  const handleAddBucket = () => {
+    remote.getCurrentWebContents().send('action', 'addBucket');
+  };
+  const handleAddClass = () => {
+    remote.getCurrentWebContents().send('action', 'addClass');
+  };
   return (
     <Wrapper {...{ open }}>
-      <MenuGroup name="Folder">
+      <MenuGroup name="Buckets" addFn={handleAddBucket}>
         <Tree tree={fileFolders} onChange={onChange} />
       </MenuGroup>
-      <MenuGroup name="Classes">
+      <MenuGroup name="Classes" addFn={handleAddClass}>
         <List setMarkFolders={setMarkFolders} list={markFolders} />
       </MenuGroup>
     </Wrapper>

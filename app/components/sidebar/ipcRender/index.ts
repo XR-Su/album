@@ -36,7 +36,7 @@ const initIpcRender = () => {
     }
     listener = (event, arg) => {
       switch (arg) {
-        case 'open':
+        case 'addBucket':
           const of = openFolderDialog();
           if (of) {
             dispatchFolder({
@@ -49,7 +49,7 @@ const initIpcRender = () => {
             remote.getCurrentWebContents().send('action', 'imagesOpen');
           }
           break;
-        case 'addMarks':
+        case 'addClass':
           const folders = uniq([
             ...(localStore.getItem('marks') || []),
             ...openFolderDialog()

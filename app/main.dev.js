@@ -103,6 +103,14 @@ app.on('ready', async () => {
     mainWindow.webContents.send('action', 'scrollEnd');
   });
 
+  mainWindow.on('resize', () => {
+    mainWindow.webContents.send('action', 'resize');
+  });
+
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('action', 'maximize');
+  });
+
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 

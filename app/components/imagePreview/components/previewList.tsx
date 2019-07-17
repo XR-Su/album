@@ -9,6 +9,12 @@ import styled from 'styled-components';
 import { animated } from 'react-spring';
 import PreviewImage from './previewImage';
 import { usePreviewAnimation } from './animations';
+import { usePreViewContext } from './context';
+
+interface previewListProps {
+  images: string[];
+  url: string;
+}
 
 const ImageContainer = styled(animated.div)`
   position: absolute;
@@ -22,8 +28,9 @@ const ImageContainer = styled(animated.div)`
   overflow: auto;
 `;
 
-const PreviewList = ({ boxWidth, images, url, setLayerOpen }) => {
-  const { springs, bind, rmCurImg } = usePreviewAnimation({
+const PreviewList = ({ images, url }: previewListProps) => {
+  const { boxWidth, setLayerOpen } = usePreViewContext();
+  const { springs, bind, rmCurImg, getCurImg } = usePreviewAnimation({
     boxWidth,
     images,
     url,
@@ -40,7 +47,7 @@ const PreviewList = ({ boxWidth, images, url, setLayerOpen }) => {
             transform: x.interpolate(offset => `translate3d(${offset}px,0,0)`)
           }}
         >
-          <PreviewImage url={images[i]} rmCurImg={rmCurImg} />
+          <PreviewImage url={images[i]} {...{ rmCurImg, getCurImg }} />
         </ImageContainer>
       ))}
     </React.Fragment>

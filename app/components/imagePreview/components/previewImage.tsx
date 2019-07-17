@@ -9,21 +9,24 @@ import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import { useGesture } from 'react-use-gesture';
 import { useAppContext } from '../../../store/appContext';
+import { usePreViewContext } from './context';
 import {
   setDragImageAction,
   setDragStatusAction
 } from '../../../store/actions';
 
-const Image = styled('img')<{ scale: number; origin: number[] }>`
+//${props => `transform-origin: ${props.origin[0]}px ${props.origin[1]}px`}
+const Image = styled('img')<{ scale: number }>`
   max-height: 100%;
   max-width: 100%;
-  ${props => `transform-origin: ${props.origin[0]}px ${props.origin[1]}px`}
+  transform-origin: top center;
   ${props => `transform: scale(${props.scale})`}
 `;
 
 interface ImageProps {
   url: string;
   rmCurImg: () => void;
+  getCurImg: () => string;
 }
 
 const initDispatch = dispatch => ({
@@ -31,33 +34,43 @@ const initDispatch = dispatch => ({
   dispatchDrStatus: (isDrag: boolean) => dispatch(setDragStatusAction(isDrag))
 });
 
-let orgWidth = 0;
-let preWidth = 0;
-let imgOrigin = [0, 0];
-const PreviewImage = ({ url, rmCurImg }: ImageProps) => {
+// let orgWidth = 0;
+let preWidth: number = 0;
+const PreviewImage = ({ url, getCurImg, rmCurImg }: ImageProps) => {
   const imgRef = React.useRef(null);
+  const [orgWidth, setOrgWidth] = React.useState(0);
   const [imgScale, setImgScale] = React.useState(1);
+  const { boxWidth } = usePreViewContext();
   const { dispatch } = useAppContext();
   const { dispatchDrImg, dispatchDrStatus } = initDispatch(dispatch);
   React.useEffect(() => {
-    //@ts-ignore
-    orgWidth = imgRef.current.clientWidth;
-    preWidth = orgWidth;
-  }, []);
+    if (getCurImg() == url) {
+      //@ts-ignore
+      setOrgWidth(imgRef.current.clientWidth);
+    }
+  });
   const bind = useGesture({
-    onMouseMove: e => {
+    // onMouseMove: e => {
+    //   //@ts-ignore
+    //   const rect = imgRef.current.getBoundingClientRect();
+    //   imgOrigin[0] = e.clientX - rect.left;
+    //   imgOrigin[1] = e.clientY - rect.top;
+    // },
+    onPinch: ({ delta }) => {
       //@ts-ignore
       const rect = imgRef.current.getBoundingClientRect();
-      imgOrigin[0] = e.clientX - rect.left;
-      imgOrigin[1] = e.clientY - rect.top;
-    },
-    onPinch: ({ delta }) => {
-      if (preWidth + delta[0] < orgWidth) {
-        setImgScale(1);
+      let scale: number = 1;
+      if (preWidth + delta[0] <= orgWidth) {
+        scale = 1;
+        preWidth = orgWidth;
+      } else if (rect.width + delta[0] >= boxWidth) {
+        scale = boxWidth / orgWidth;
+        preWidth = boxWidth;
       } else {
-        setImgScale((preWidth + delta[0] / 2) / orgWidth);
+        scale = (preWidth + delta[0] / 2) / orgWidth;
         preWidth += delta[0] / 2;
       }
+      setImgScale(scale);
     }
   });
   const handleDragStart = () => {
@@ -76,7 +89,6 @@ const PreviewImage = ({ url, rmCurImg }: ImageProps) => {
       onDragEnd={handleDragEnd}
       src={url}
       scale={imgScale}
-      origin={imgOrigin}
     />
   );
 };

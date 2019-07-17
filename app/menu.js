@@ -79,15 +79,15 @@ export default class MenuBuilder {
       label: 'File',
       submenu: [
         {
-          label: 'Open...',
+          label: 'Add Buckets',
           click: () => {
-            this.mainWindow.webContents.send('action', 'open');
+            this.mainWindow.webContents.send('action', 'addBucket');
           }
         },
         {
-          label: 'Add Marks',
+          label: 'Add Classes',
           click: () => {
-            this.mainWindow.webContents.send('action', 'addMarks');
+            this.mainWindow.webContents.send('action', 'addClass');
           }
         }
       ]

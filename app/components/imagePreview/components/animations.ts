@@ -54,6 +54,7 @@ export const usePreviewAnimation = ({
         : { x, display: 'flex' };
     });
   };
+  const getCurImg = () => preImages[curIndex];
   const rmCurImg = () => {
     const tmp = [...preImages];
     tmp.splice(curIndex, 1);
@@ -88,7 +89,7 @@ export const usePreviewAnimation = ({
       }
     }
   });
-  return { bind, rmCurImg, springs };
+  return { bind, rmCurImg, getCurImg, springs };
 };
 
 export default { usePreviewAnimation };

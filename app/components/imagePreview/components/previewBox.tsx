@@ -8,6 +8,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { initIpcRender, cleanupIpcRender } from '../ipcRender';
 import PreviewList from './previewList';
+import PreviewProvider from './context';
 
 interface PreviewBoxProps {
   setLayerOpen: (val: boolean) => void;
@@ -46,7 +47,9 @@ const PreviewBox = ({ setLayerOpen, images, url }: PreviewBoxProps) => {
   };
   return (
     <Wrapper ref={wrapper}>
-      <PreviewList {...{ boxWidth, images, url, setLayerOpen }} />
+      <PreviewProvider {...{ boxWidth, setLayerOpen }}>
+        <PreviewList {...{ images, url }} />
+      </PreviewProvider>
     </Wrapper>
   );
 };

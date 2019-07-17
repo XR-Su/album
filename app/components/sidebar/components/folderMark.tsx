@@ -5,6 +5,7 @@
  * @date 2019-07-02
  */
 import React from 'react';
+import { remote } from 'electron';
 import styled from 'styled-components';
 import { animated } from 'react-spring';
 import { useAppContext } from '../../../store/appContext';
@@ -132,6 +133,7 @@ const FolderMark = React.memo(({ folder, setMarkFolders }: FolderMarkProps) => {
   const handleClick = () => {
     if (isFolderExisted) {
       setSelFolder(folder);
+      remote.getCurrentWebContents().send('action', 'imagesOpen');
     }
   };
   /** attributes **/

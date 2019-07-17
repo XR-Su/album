@@ -20,7 +20,7 @@ export const AppContext = React.createContext<AppContext>({
 export let useAppContext: () => AppContext;
 useAppContext = () => React.useContext(AppContext);
 
-const AppContextProvider = ({ children }) => {
+const AppProvider = ({ children }) => {
   const { state, dispatch } = useAppStore();
   return (
     <AppContext.Provider value={{ state, dispatch }}>
@@ -29,4 +29,4 @@ const AppContextProvider = ({ children }) => {
   );
 };
 
-export default AppContextProvider;
+export default AppProvider;
