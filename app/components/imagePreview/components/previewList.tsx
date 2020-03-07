@@ -18,14 +18,11 @@ interface previewListProps {
 
 const ImageContainer = styled(animated.div)`
   position: absolute;
-  display: flex;
   justify-content: center;
-  align-items: center;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
-  overflow: auto;
 `;
 
 const PreviewList = ({ images, url }: previewListProps) => {

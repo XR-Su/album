@@ -22,6 +22,7 @@ const ImagesContainer = styled('div')`
   margin: 4px 0 0 -3px;
   display: flex;
   flex-wrap: wrap
+  position: relative;
   justify-content: flex-start;
   flex: 1;
   align-content: start;

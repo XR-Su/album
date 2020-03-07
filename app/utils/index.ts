@@ -14,3 +14,5 @@ export { default as moveFile } from './moveFile';
 export { default as localStore } from './localStore';
 
 export { default as checkFileExist } from './checkFileExist';
+
+export { default as getImageMetaData } from './getImageMetaData';

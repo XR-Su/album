@@ -10,18 +10,34 @@ import { ipcRenderer } from 'electron';
 import { useGesture } from 'react-use-gesture';
 import { useAppContext } from '../../../store/appContext';
 import { usePreViewContext } from './context';
+import Image from '../../image';
+import ToolBar from './toolBar';
 import {
   setDragImageAction,
   setDragStatusAction
 } from '../../../store/actions';
 
-//${props => `transform-origin: ${props.origin[0]}px ${props.origin[1]}px`}
-const Image = styled('img')<{ scale: number }>`
-  max-height: 100%;
-  max-width: 100%;
-  transform-origin: top center;
-  ${props => `transform: scale(${props.scale})`}
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  overflow: auto;
 `;
+
+//${props => `transform-origin: ${props.origin[0]}px ${props.origin[1]}px`}
+// const Image = styled('img')<{ scale: number }>`
+//   max-height: 100%;
+//   max-width: 100%;
+//   transform-origin: center center;
+//   ${props => `transform: scale(${props.scale})`}
+// `;
+
+const ImageStyle = {
+  maxHeight: '100%',
+  maxWidth: '100%',
+  transformOrigin: 'center center'
+};
 
 interface ImageProps {
   url: string;
@@ -40,6 +56,7 @@ const PreviewImage = ({ url, getCurImg, rmCurImg }: ImageProps) => {
   const imgRef = React.useRef(null);
   const [orgWidth, setOrgWidth] = React.useState(0);
   const [imgScale, setImgScale] = React.useState(1);
+  const forceUpdate = React.useState([])[1];
   const { boxWidth } = usePreViewContext();
   const { dispatch } = useAppContext();
   const { dispatchDrImg, dispatchDrStatus } = initDispatch(dispatch);
@@ -82,14 +99,19 @@ const PreviewImage = ({ url, getCurImg, rmCurImg }: ImageProps) => {
     rmCurImg();
   };
   return (
-    <Image
-      ref={imgRef}
-      {...bind()}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      src={url}
-      scale={imgScale}
-    />
+    <Wrapper>
+      <Image
+        src={url}
+        style={ImageStyle}
+        options={{
+          ref: imgRef,
+          ...bind(),
+          onDragStart: handleDragStart,
+          onDragEnd: handleDragEnd
+        }}
+      />
+      <ToolBar img={url} previewUpdate={forceUpdate} />
+    </Wrapper>
   );
 };
 
